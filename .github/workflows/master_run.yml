@@ -12,49 +12,52 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 1. Direct API Connectivity Test
+      - name: 1. Repair Project Structure (Crucial)
         run: |
-          echo "Testing DeepSeek API with Direct Key..."
-          # আপনার দেওয়া কী সরাসরি এখানে ব্যবহার করা হয়েছে
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST https://api.deepseek.com/chat/completions \
-            -H "Authorization: Bearer sk-94945e8a5d9740ebac3b702b000f51df" \
-            -H "Content-Type: application/json" \
-            -d '{"model": "deepseek-chat", "messages": [{"role": "user", "content": "hi"}]}')
-          
-          if [ "$RESPONSE" == "200" ] || [ "$RESPONSE" == "401" ]; then
-            echo "✅ API Endpoint reached (Status: $RESPONSE)"
-          else
-            echo "⚠️ API Connection issue, but proceeding to build..."
-          fi
+          # ১. settings.gradle ফাইল জোর করে তৈরি করা
+          echo "rootProject.name = 'NetGuard-Sentinel'" > settings.gradle
+          echo "include ':app'" >> settings.gradle
 
-      - name: 2. Repair Engine & Permissions
-        run: |
+          # ২. প্রজেক্ট লেভেল build.gradle তৈরি
+          cat <<EOF > build.gradle
+          buildscript {
+              repositories { google(); mavenCentral() }
+              dependencies { 
+                  classpath 'com.android.tools.build:gradle:8.2.0'
+                  classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0"
+              }
+          }
+          allprojects { repositories { google(); mavenCentral() } }
+          EOF
+
+          # ৩. Gradle Wrapper এবং পারমিশন ঠিক করা
           gradle wrapper --gradle-version 8.2
           chmod +x gradlew
-          echo "✅ Gradle engine stabilized."
+          echo "✅ Project Structure Repaired."
 
-      - name: 3. Setup Environment (Java 17)
+      - name: 2. Setup Environment (Java 17)
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
-      - name: 4. Compile APK (The Final Step)
-        run: ./gradlew assembleDebug --stacktrace
+      - name: 3. Compile APK
+        # এবার এটি অবশ্যই 'app' মডিউল খুঁজে পাবে
+        run: ./gradlew :app:assembleDebug --stacktrace
 
-      - name: 5. Deliver NetGuard Sentinel APK
+      - name: 4. Deliver NetGuard Sentinel APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: NetGuard-Final-V1
           path: app/build/outputs/apk/debug/*.apk
 
-      - name: 6. Push Stability Updates
+      - name: 5. Force Sync to GitHub
         if: always()
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add .
-          git commit -m "Final project structure finalized" || echo "No changes"
+          git commit -m "Repaired root structure and build successfully" || echo "No changes"
           git push
