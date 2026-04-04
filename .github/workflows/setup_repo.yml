@@ -1,16 +1,18 @@
 name: Initialize Project Structure
 
 on:
-  workflow_dispatch: # এটি দিলে আপনি ম্যানুয়ালি বাটন টিপে রান করতে পারবেন
+  workflow_dispatch:
 
 jobs:
   create-folders:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # সরাসরি এখান থেকেই রাইট পারমিশন দিয়ে দিলাম
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # লেটেস্ট ভার্সন ব্যবহার করছি
 
-      - name: Create Folder Structure
+      - name: Build Project Skeleton
         run: |
           mkdir -p app/src/main/java/com/guardnet/vpn
           mkdir -p app/src/main/java/com/guardnet/monitor
@@ -21,11 +23,12 @@ jobs:
           touch app/src/main/java/com/guardnet/monitor/.gitkeep
           touch core-native/.gitkeep
           touch docs/.gitkeep
+          echo "# NetGuard-Sentinel Project Structure" > README.md
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add .
-          git commit -m "Initial professional project structure"
+          git commit -m "Fix: Initial structure created with write permissions" || echo "No changes to commit"
           git push
