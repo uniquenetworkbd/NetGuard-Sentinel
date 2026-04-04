@@ -1,0 +1,57 @@
+name: Inject Core Project Code
+
+on:
+  workflow_dispatch:
+
+jobs:
+  inject-files:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Directories and Inject Files
+        run: |
+          # ১. নতুন ফোল্ডার তৈরি (Database এর জন্য)
+          mkdir -p app/src/main/java/com/guardnet/vpn/data
+          mkdir -p app/src/main/res/values
+
+          # ২. MainActivity.kt তৈরি
+          cat <<'EOF' > app/src/main/java/com/guardnet/vpn/MainActivity.kt
+          // DeepSeek এর দেওয়া MainActivity.kt কোডটি এখানে পেস্ট করুন
+          EOF
+
+          # ৩. MyVpnService.kt তৈরি
+          cat <<'EOF' > app/src/main/java/com/guardnet/vpn/MyVpnService.kt
+          // DeepSeek এর দেওয়া MyVpnService.kt কোডটি এখানে পেস্ট করুন
+          EOF
+
+          # ৪. ডাটাবেস ফাইল (TrafficLog.kt) তৈরি
+          cat <<'EOF' > app/src/main/java/com/guardnet/vpn/data/TrafficLog.kt
+          // DeepSeek এর দেওয়া TrafficLog.kt কোডটি এখানে পেস্ট করুন
+          EOF
+
+          # ৫. ডাটাবেস ফাইল (TrafficDatabase.kt) তৈরি
+          cat <<'EOF' > app/src/main/java/com/guardnet/vpn/data/TrafficDatabase.kt
+          // DeepSeek এর দেওয়া TrafficDatabase.kt কোডটি এখানে পেস্ট করুন
+          EOF
+
+          # ৬. AndroidManifest.xml আপডেট
+          cat <<'EOF' > app/src/main/AndroidManifest.xml
+          // DeepSeek এর দেওয়া AndroidManifest.xml কোডটি এখানে পেস্ট করুন
+          EOF
+
+          # ৭. build.gradle (Module: app) আপডেট
+          cat <<'EOF' > app/build.gradle
+          // DeepSeek এর দেওয়া build.gradle কোডটি এখানে পেস্ট করুন
+          EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add .
+          git commit -m "Full core logic and database injected" || echo "No changes to commit"
+          git push
