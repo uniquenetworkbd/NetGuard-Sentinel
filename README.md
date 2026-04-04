@@ -1,1 +1,1 @@
-# NetGuard-Sentinel
+# NetGuard-Sentinel Project Structure
