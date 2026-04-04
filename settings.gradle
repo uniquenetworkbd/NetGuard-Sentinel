@@ -1,0 +1,2 @@
+rootProject.name = 'NetGuard-Sentinel'
+include ':app'
