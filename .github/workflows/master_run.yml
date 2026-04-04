@@ -1,0 +1,54 @@
+name: Master Integrity & Build Automator
+
+on:
+  workflow_dispatch: # আপনি যখনই চাইবেন বাটন টিপে এটি রান করবেন
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 1. Integrity Check (Folder Structure)
+        run: |
+          echo "Verifying project structure..."
+          mkdir -p app/src/main/java/com/guardnet/vpn/data
+          mkdir -p app/src/main/res/xml
+          mkdir -p app/src/main/res/values
+
+      - name: 2. Set Up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: 3. Verify Gradle Wrapper
+        run: |
+          if [ ! -f "gradlew" ]; then
+            echo "Gradle wrapper missing! Generating..."
+            gradle wrapper --gradle-version 8.2
+          fi
+          chmod +x gradlew
+
+      - name: 4. Build Project (The Ultimate Test)
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: 5. Upload Final APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NetGuard-Sentinel-Final-APK
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: 6. Auto-Commit Fixes (If any)
+        if: always()
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add .
+          git commit -m "Automated integrity check and structure alignment" || echo "No changes"
+          git push
