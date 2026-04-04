@@ -1,0 +1,50 @@
+name: Fix Gradle and Root Config
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix-project:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Missing Root Files
+        run: |
+          # ১. settings.gradle তৈরি
+          echo "rootProject.name = 'NetGuard-Sentinel'" > settings.gradle
+          echo "include ':app'" >> settings.gradle
+
+          # ২. Project level build.gradle তৈরি
+          cat <<EOF > build.gradle
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.2.0'
+                  classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0"
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
+
+          # ৩. Gradle Wrapper জেনারেট করা
+          gradle wrapper --gradle-version 8.2
+
+      - name: Commit and Push Fixes
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add .
+          git commit -m "Fix: Added Gradle wrapper and root config files" || echo "No changes"
+          git push
