@@ -1,10 +1,10 @@
-name: Master Integrity & Build Automator
+name: The One-Shot Master Builder
 
 on:
-  workflow_dispatch: # আপনি যখনই চাইবেন বাটন টিপে এটি রান করবেন
+  workflow_dispatch:
 
 jobs:
-  check-and-build:
+  rebuild-and-build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -12,43 +12,38 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 1. Integrity Check (Folder Structure)
+      - name: 1. Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 2. Force Create Project Structure
         run: |
-          echo "Verifying project structure..."
           mkdir -p app/src/main/java/com/guardnet/vpn/data
           mkdir -p app/src/main/res/xml
           mkdir -p app/src/main/res/values
 
-      - name: 2. Set Up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: 3. Verify Gradle Wrapper
+      - name: 3. Setup Gradle Wrapper (The Engine)
         run: |
-          if [ ! -f "gradlew" ]; then
-            echo "Gradle wrapper missing! Generating..."
-            gradle wrapper --gradle-version 8.2
-          fi
+          gradle wrapper --gradle-version 8.2
           chmod +x gradlew
 
-      - name: 4. Build Project (The Ultimate Test)
+      - name: 4. Build Final APK
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: 5. Upload Final APK
+      - name: 5. Upload NetGuard APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: NetGuard-Sentinel-Final-APK
+          name: NetGuard-Sentinel-V1
           path: app/build/outputs/apk/debug/*.apk
 
-      - name: 6. Auto-Commit Fixes (If any)
+      - name: 6. Save Engine to Repo
         if: always()
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add .
-          git commit -m "Automated integrity check and structure alignment" || echo "No changes"
+          git commit -m "Engine and structure stabilized" || echo "No changes"
           git push
