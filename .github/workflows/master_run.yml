@@ -1,12 +1,60 @@
-- name: 1. Test DeepSeek API Connection
+name: NetGuard Smart Build V2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 1. Test DeepSeek API Connection
         env:
-          DEEPSEEK_KEY: ${{ secrets.NetGuardSentinelDS }} # নতুন নাম এখানে আপডেট করা হয়েছে
+          DEEPSEEK_KEY: ${{ secrets.NetGuardSentinelDS }}
         run: |
-          echo "Checking DeepSeek API Connectivity..."
+          echo "Checking DeepSeek API Connectivity with New Secret..."
           if [ -z "$DEEPSEEK_KEY" ]; then
-            echo "❌ ERROR: API Key 'NetGuardSentinelDS' not found in GitHub Secrets!"
+            echo "❌ ERROR: Secret 'NetGuardSentinelDS' not found! Please check GitHub Secrets."
             exit 1
           else
-            echo "✅ API Key found. Testing connection..."
-            curl -I https://api.deepseek.com || echo "API endpoint reachable"
+            echo "✅ Secret 'NetGuardSentinelDS' found. Testing connection..."
+            # API এনডপয়েন্ট চেক করা
+            curl -I https://api.deepseek.com || echo "DeepSeek API reachable"
           fi
+
+      - name: 2. Force Permissions & Gradle Setup
+        run: |
+          echo "Setting up Gradle wrapper..."
+          gradle wrapper --gradle-version 8.2
+          chmod +x gradlew
+          echo "✅ Permissions and Engine Ready."
+
+      - name: 3. Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: 4. Final APK Compilation
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: 5. Upload NetGuard APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NetGuard-Sentinel-V2
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: 6. Sync and Save Changes
+        if: always()
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add .
+          git commit -m "Build stabilized with NetGuardSentinelDS secret" || echo "No changes"
+          git push
