@@ -1,0 +1,45 @@
+name: NetGuard AI Self-Healer
+
+on:
+  workflow_dispatch: # আপনি ম্যানুয়ালি রান করতে পারবেন
+
+jobs:
+  ai-repair:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Ask DeepSeek to Fix Code
+        id: ai_fix
+        run: |
+          # এখানে আমরা একটি ডামি এরর মেসেজ দিচ্ছি (উদাহরণস্বরূপ)
+          ERROR_LOG="Task :app:compileDebugKotlin FAILED. Unresolved reference: TrafficDatabase"
+          
+          echo "Sending error to DeepSeek AI..."
+          
+          # AI এর কাছে রিকোয়েস্ট পাঠানো
+          RESPONSE=$(curl -s https://api.deepseek.com/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer sk-94945e8a5d9740ebac3b702b000f51df" \
+            -d '{
+                  "model": "deepseek-chat",
+                  "messages": [
+                    {"role": "system", "content": "You are an Android Expert. Fix the Kotlin code errors provided."},
+                    {"role": "user", "content": "The error is: '"$ERROR_LOG"'. Please provide the corrected code for MainActivity.kt."}
+                  ]
+                }')
+          
+          echo "AI Response received."
+          # এখানে AI এর রেসপন্স থেকে কোড আলাদা করে ফাইলে সেভ করার লজিক থাকবে
+
+      - name: Apply Fix and Push
+        run: |
+          git config --global user.name "NetGuard-AI-Bot"
+          git config --global user.email "ai-bot@uniquenetwork.bd"
+          # এডিট করা ফাইল অ্যাড করা
+          git add .
+          git commit -m "AI Auto-Fix: Resolved compilation errors" || echo "No changes"
+          git push
