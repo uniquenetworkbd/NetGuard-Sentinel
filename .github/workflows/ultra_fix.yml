@@ -1,0 +1,52 @@
+name: Final Direct Linker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  link-all:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Force Rewrite All Files with Correct Imports
+        run: |
+          # সব ফাইল ঠিক জায়গায় আছে কিনা নিশ্চিত করা
+          mkdir -p app/src/main/java/com/guardnet/vpn/data
+
+          # ১. MainActivity.kt (DeepSeek এর কোড এখানে)
+          cat <<'EOF' > app/src/main/java/com/guardnet/vpn/MainActivity.kt
+          package com.guardnet.vpn
+          import com.guardnet.vpn.data.* // এটি যোগ করা জরুরি
+          // বাকি কোড...
+          EOF
+
+          # ২. MyVpnService.kt
+          cat <<'EOF' > app/src/main/java/com/guardnet/vpn/MyVpnService.kt
+          package com.guardnet.vpn
+          import com.guardnet.vpn.data.*
+          // বাকি কোড...
+          EOF
+
+          # ৩. TrafficLog.kt (Data ফোল্ডারে)
+          cat <<'EOF' > app/src/main/java/com/guardnet/vpn/data/TrafficLog.kt
+          package com.guardnet.vpn.data
+          // বাকি কোড...
+          EOF
+
+          # ৪. TrafficDatabase.kt (Data ফোল্ডারে)
+          cat <<'EOF' > app/src/main/java/com/guardnet/vpn/data/TrafficDatabase.kt
+          package com.guardnet.vpn.data
+          // বাকি কোড...
+          EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add .
+          git commit -m "Final link between UI, Service and Database" || echo "No changes"
+          git push
