@@ -11,7 +11,7 @@ async function triggerAI() {
             method: 'POST',
             headers: {
                 // নিশ্চিত করুন এখানে আপনার টোকেনটি 'Bearer ' সহ আছে
-                'Authorization': 'Bearer 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',
+                'Authorization': 'Bearer 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',
                 'Accept': 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json'
             },
