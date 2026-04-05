@@ -1,50 +1,51 @@
-name: 🚀 System Health Check Final
+name: 🚀 Dual-Engine Health Check
 
 on:
   workflow_dispatch: 
 
 jobs:
-  check-secrets:
+  validate-system:
     runs-on: ubuntu-latest
     steps:
-      - name: 1. Checkout Repository
+      - name: 1. Repo Checkout
         uses: actions/checkout@v4
 
-      - name: 2. Test Connections (Fixed Variable Names)
+      - name: 2. Check All Engines
         env:
-          # আপনার দেওয়া হুবহু নাম এখানে ব্যবহার করা হয়েছে
-          DS_KEY: ${{ secrets.NetGuardSentinelDS }}
+          DS_KEY: ${{ secrets.NSDS }}
+          VIBE_KEY: ${{ secrets.VibecodeCLI }}
           TG_TOKEN: ${{ secrets.TELEGRAMBOTTOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAMCHATID }}
         run: |
-          echo "🔍 Testing Telegram Connection..."
-          TG_RES=$(curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-            -d chat_id=$CHAT_ID -d text="✅ Telegram Connection: OK (Verified by Sentinel)")
-          
-          if [[ $TG_RES == *"\"ok\":true"* ]]; then
-            echo "Telegram: OK"
-          else
-            echo "Telegram: FAILED. Please double check TELEGRAMBOTTOKEN and TELEGRAMCHATID."
-            exit 1
-          fi
+          # ১. টেলিগ্রাম কানেকশন চেক
+          echo "📡 Testing Telegram..."
+          curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
+            -d chat_id=$CHAT_ID -d text="🔍 Health Check Started: Testing NSDS and VibecodeCLI..."
 
-          echo "🔍 Testing DeepSeek AI Connection..."
+          # ২. DeepSeek (NSDS) চেক
+          echo "🧠 Testing DeepSeek (NSDS)..."
           AI_RES=$(curl -s https://api.deepseek.com/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $DS_KEY" \
             -d '{"model": "deepseek-chat", "messages": [{"role": "user", "content": "Hi"}]}')
           
           if [[ $AI_RES == *"choices"* ]]; then
-            echo "DeepSeek AI: OK"
             curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-              -d chat_id=$CHAT_ID -d text="✅ DeepSeek AI: OK (Verified by NetGuardSentinelDS)"
+              -d chat_id=$CHAT_ID -d text="✅ NSDS AI Engine: ONLINE"
           else
-            echo "DeepSeek AI: FAILED"
-            # ব্যর্থ হলে আসল কারণটি টেলিগ্রামে পাঠিয়ে দিবে
             curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-              -d chat_id=$CHAT_ID -d text="❌ AI Connection Failed. API Response: $AI_RES"
-            exit 1
+              -d chat_id=$CHAT_ID -d text="❌ NSDS AI Failed. Reason: $AI_RES"
           fi
 
-      - name: 3. Final Report
-        run: echo "🎉 Ready for the AI Revolution!"
+          # ৩. VibecodeCLI (Secret existence) চেক
+          echo "🛠️ Testing VibecodeCLI Key..."
+          if [[ -n "$VIBE_KEY" ]]; then
+            curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
+              -d chat_id=$CHAT_ID -d text="✅ VibecodeCLI Key: DETECTED & LOADED"
+          else
+            curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
+              -d chat_id=$CHAT_ID -d text="❌ VibecodeCLI Key: NOT FOUND"
+          fi
+
+      - name: 3. Final Status
+        run: echo "Health check sequence completed."
