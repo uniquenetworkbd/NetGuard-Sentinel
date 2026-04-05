@@ -1,20 +1,25 @@
-name: 🧠 Sentinel Brain: Operational Core v1.0
+name: 🧠 Sentinel Brain: Operational Core v1.1
 
 on:
-  workflow_dispatch: # আপনার ম্যানুয়াল কমান্ডে বিপ্লব শুরু হবে
+  workflow_dispatch: 
   push:
-    branches: [ main ] # কোড পুশ করলেই এআই রি-স্ক্যান করবে
+    branches: [ main ]
 
 jobs:
   brain-initialization:
     runs-on: ubuntu-latest
-    permissions: write-all
+    # এখানে পারমিশন ফিক্স করা হয়েছে
+    permissions:
+      contents: write
+      pull-requests: write
+    
     steps:
       - name: 📂 Secure Repository Access
         uses: actions/checkout@v4
         with:
           lfs: true
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }} # অটোমেটিক পারমিশন টোকেন
 
       - name: 🛠️ Initialize 1GB Neural Architecture
         env:
@@ -23,24 +28,25 @@ jobs:
           TG_TOKEN: ${{ secrets.TELEGRAMBOTTOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAMCHATID }}
         run: |
-          # ১. প্রফেশনাল ডিরেক্টরি স্ট্রাকচার (The 5 Zones)
+          # ফোল্ডার তৈরি (Force Create)
           mkdir -p brain_core/logic evolution_logs security_cortex/firewall isp_intelligence/mikrotik assets_vault/models
           
-          # ২. সিস্টেম স্টেট জেনারেট (System DNA)
-          TIMESTAMP=$(date +'%Y-%m-%d %H:%M:%S')
-          echo "{\"status\": \"OPERATIONAL\", \"version\": \"1.0.0\", \"last_sync\": \"$TIMESTAMP\", \"storage_limit\": \"1024MB\"}" > brain_core/metadata.json
+          # মেটাডাটা জেনারেট
+          echo "{\"status\": \"OPERATIONAL\", \"version\": \"1.1.0\", \"storage\": \"1024MB\"}" > brain_core/metadata.json
           
-          # ৩. প্রাথমিক সিকিউরিটি শিল্ড (Zero-Trust Logic)
-          echo "deny all; allow 127.0.0.1;" > security_cortex/firewall/default.rules
-
-          # ৪. টেলিগ্রাম সিগন্যাল (Professional Reporting)
+          # টেলিগ্রাম রিপোর্ট
           curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-            -d chat_id=$CHAT_ID -d text="🧬 [SENTINEL CORE] Operational Phase 1: Success. 1GB Neural Structure Locked. All API Engines (NSDS & Vibecode) Synced."
+            -d chat_id=$CHAT_ID -d text="🧬 [SENTINEL CORE] Phase 1 Attempt 2: Initializing Neural Zones..."
 
-      - name: 🛰️ Synchronize Brain State
+      - name: 🛰️ Synchronize Brain State (Force Sync)
         run: |
           git config --global user.name "Sentinel-Architect"
           git config --global user.email "architect@uniquenetwork.bd"
           git add .
-          git commit -m "🧠 [CORE UPDATE] Initializing Giant Brain Architecture v1.0" || echo "No changes to commit"
-          git push origin main
+          # পরিবর্তন থাকলে তবেই পুশ করবে
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🧠 [CORE UPDATE] Giant Brain Architecture v1.1"
+            git push origin main
+          fi
