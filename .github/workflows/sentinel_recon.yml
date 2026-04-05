@@ -1,9 +1,7 @@
 name: 🔍 Sentinel Recon: Project Auditor
 
 on:
-  workflow_dispatch: # ম্যানুয়ালি রান করার জন্য
-  schedule:
-    - cron: '0 0 * * *' # প্রতিদিন রাত ১২টায় অটোমেটিক স্ক্যান করবে
+  workflow_dispatch: 
 
 jobs:
   audit-and-report:
@@ -14,6 +12,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: 🛠️ Install Tree Dependency
+        run: sudo apt-get install -y tree
+
       - name: 🛰️ Deep Scan & Reporting
         env:
           TG_TOKEN: ${{ secrets.TELEGRAMBOTTOKEN }}
@@ -21,21 +22,28 @@ jobs:
         run: |
           echo "🔍 Starting Deep Scan..."
           
-          # ১. ডিরেক্টরি স্ট্রাকচার তৈরি
-          PROJECT_TREE=$(tree -L 3 -I 'node_modules|.git' --dirsfirst)
+          # ১. ডিরেক্টরি স্ট্রাকচার তৈরি (যদি tree কাজ না করে তবে ls ব্যবহার করবে)
+          PROJECT_TREE=$(tree -L 2 -I 'node_modules|.git' --dirsfirst || ls -R)
           
           # ২. স্টোরেজ এনালাইসিস
           STORAGE_INFO=$(du -sh . | awk '{print $1}')
           FILE_COUNT=$(find . -type f | wc -l)
           
-          # ৩. প্রফেশনাল রিপোর্ট ফরম্যাট
+          # ৩. প্রফেশনাল রিপোর্ট তৈরি
+          # রিপোর্টটি একটু ছোট রাখা হয়েছে যাতে টেলিগ্রাম ব্লক না করে
           REPORT="📊 *SENTINEL RECON REPORT* 📊%0A%0A"
-          REPORT+="📂 *Current Structure:*%0A\`\`\`%0A$PROJECT_TREE%0A\`\`\`%0A"
-          REPORT+="📈 *Storage Usage:* $STORAGE_INFO / 1024MB%0A"
-          REPORT+="📄 *Total Files:* $FILE_COUNT%0A"
-          REPORT+="🛡️ *System Health:* OPERATIONAL (Verified)%0A"
-          REPORT+="🕒 *Scan Time:* $(date)"
+          REPORT+="📈 *Storage:* $STORAGE_INFO / 1024MB%0A"
+          REPORT+="📄 *Files:* $FILE_COUNT%0A%0A"
+          REPORT+="📂 *Structure:*%0A\`\`\`%0A$PROJECT_TREE%0A\`\`\`"
 
           # ৪. টেলিগ্রামে রিপোর্ট পাঠানো
-          curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-            -d chat_id=$CHAT_ID -d parse_mode="Markdown" -d text="$REPORT"
+          RESPONSE=$(curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
+            -d chat_id=$CHAT_ID -d parse_mode="Markdown" -d text="$REPORT")
+          
+          echo "Telegram Response: $RESPONSE"
+          
+          # যদি এরর আসে তবে সাধারণ টেক্সট হিসেবে পাঠাবে
+          if [[ $RESPONSE != *"\"ok\":true"* ]]; then
+            curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
+              -d chat_id=$CHAT_ID -d text="⚠️ Recon: Markdown Report failed, sending raw data. Storage: $STORAGE_INFO, Files: $FILE_COUNT"
+          fi
