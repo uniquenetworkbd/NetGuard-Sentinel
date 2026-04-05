@@ -38,7 +38,7 @@ jobs:
             curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
               -d chat_id=$CHAT_ID -d text="✅ Giant Brain Health Check: DeepSeek AI Engine is ACTIVE using NETGUARDSENTINELDS."
           else
-            echo "DeepSeek AI: FAILED. Check your NETGUARDSENTINELDS secret."
+            echo "DeepSeek AI: FAILED. Check your NetGuardSentinelDS secret."
             curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
               -d chat_id=$CHAT_ID -d text="❌ DeepSeek AI Connection Failed."
             exit 1
