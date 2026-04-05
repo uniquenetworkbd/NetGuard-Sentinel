@@ -1,4 +1,5 @@
-name: 🧠 Sentinel Brain: Operational Core v1.1
+# ইমোজি সরিয়ে সরাসরি টেক্সট ব্যবহার করা হয়েছে যাতে সিনট্যাক্স এরর না আসে
+name: Sentinel-Brain-Operational-Core
 
 on:
   workflow_dispatch: 
@@ -8,45 +9,43 @@ on:
 jobs:
   brain-initialization:
     runs-on: ubuntu-latest
-    # এখানে পারমিশন ফিক্স করা হয়েছে
     permissions:
       contents: write
       pull-requests: write
     
     steps:
-      - name: 📂 Secure Repository Access
+      - name: Secure Repository Access
         uses: actions/checkout@v4
         with:
           lfs: true
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }} # অটোমেটিক পারমিশন টোকেন
 
-      - name: 🛠️ Initialize 1GB Neural Architecture
+      - name: Initialize 1GB Neural Architecture
         env:
           DS_KEY: ${{ secrets.NSDS }}
           VIBE_KEY: ${{ secrets.VibecodeCLI }}
           TG_TOKEN: ${{ secrets.TELEGRAMBOTTOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAMCHATID }}
         run: |
-          # ফোল্ডার তৈরি (Force Create)
+          # ডিরেক্টরি তৈরি
           mkdir -p brain_core/logic evolution_logs security_cortex/firewall isp_intelligence/mikrotik assets_vault/models
           
-          # মেটাডাটা জেনারেট
-          echo "{\"status\": \"OPERATIONAL\", \"version\": \"1.1.0\", \"storage\": \"1024MB\"}" > brain_core/metadata.json
+          # সিস্টেম স্টেট জেনারেট
+          echo "{\"status\": \"OPERATIONAL\", \"version\": \"1.2.0\", \"storage\": \"1024MB\"}" > brain_core/metadata.json
           
-          # টেলিগ্রাম রিপোর্ট
+          # টেলিগ্রাম রিপোর্ট (এখানে ইমোজি ব্যবহারে সমস্যা নেই)
           curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-            -d chat_id=$CHAT_ID -d text="🧬 [SENTINEL CORE] Phase 1 Attempt 2: Initializing Neural Zones..."
+            -d chat_id=$CHAT_ID -d text="🧬 [SENTINEL CORE] Phase 1: Neural Structure Locked. All Engines Ready."
 
-      - name: 🛰️ Synchronize Brain State (Force Sync)
+      - name: Synchronize Brain State
         run: |
           git config --global user.name "Sentinel-Architect"
           git config --global user.email "architect@uniquenetwork.bd"
           git add .
-          # পরিবর্তন থাকলে তবেই পুশ করবে
+          # পরিবর্তন থাকলে তবেই পুশ করবে যাতে লুপ তৈরি না হয়
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🧠 [CORE UPDATE] Giant Brain Architecture v1.1"
+            git commit -m "Core Update: Initializing Giant Brain v1.2"
             git push origin main
           fi
