@@ -1,4 +1,4 @@
-name: Supreme Nano-AI Architect 🧠
+name: Supreme Nano-AI Architect
 
 on:
   workflow_dispatch:
@@ -16,17 +16,17 @@ jobs:
       - name: 1. Deep-Clean & Checkout
         uses: actions/checkout@v4
 
-      - name: 2. Signal Telegram: Analyzing Environment
+      - name: 2. Signal Telegram
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ env.TG_TOKEN }}/sendMessage \
-          -d chat_id=${{ env.CHAT_ID }} -d text="🧠 Nano-AI Architect is waking up. Cleaning environment and reconstructing project... 🧹"
+          -d chat_id=${{ env.CHAT_ID }} \
+          -d text="🧠 Nano-AI Architect is waking up. Cleaning environment and reconstructing project... 🧹"
 
       - name: 3. Force-Construct Industrial Architecture
         run: |
-          # সব পুরোনো ফাইল ডিলিট করে নতুন করে শুরু
+          # পুরোনো সব ফাইল ডিলিট করে নতুন করে শুরু
           find . -maxdepth 1 -not -path '*/.*' -not -name '.git' -not -name '.github' -delete
           
-          # প্রজেক্টের হাড়গোড় (Structure) তৈরি
           mkdir -p app/src/main/java/com/guardnet/vpn
           mkdir -p app/src/main/res/layout
           mkdir -p app/src/main/res/values
@@ -44,7 +44,7 @@ jobs:
           allprojects { repositories { google(); mavenCentral() } }
           EOF
 
-          # ৩. App Module Logic (AI Optimized)
+          # ৩. App Module Logic
           cat <<EOF > app/build.gradle
           plugins { id 'com.android.application'; id 'kotlin-android' }
           android {
@@ -61,10 +61,10 @@ jobs:
           }
           EOF
 
-          # ৪. Android Manifest (The Brain)
+          # ৪. Android Manifest
           echo '<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.guardnet.vpn"><application android:label="NetGuard Sentinel" android:theme="@style/Theme.AppCompat.Light.NoActionBar"><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter></activity></application></manifest>' > app/src/main/AndroidManifest.xml
 
-          # ৫. Pro-Level MainActivity
+          # ৫. MainActivity
           cat <<EOF > app/src/main/java/com/guardnet/vpn/MainActivity.kt
           package com.guardnet.vpn
           import android.os.Bundle
@@ -72,12 +72,11 @@ jobs:
           class MainActivity : AppCompatActivity() {
               override fun onCreate(savedInstanceState: Bundle?) {
                   super.onCreate(savedInstanceState)
-                  // Nano-AI Logic Implemented
               }
           }
           EOF
 
-      - name: 4. Build Phase (The Moment of Truth)
+      - name: 4. Build Phase
         run: |
           gradle wrapper --gradle-version 8.2
           chmod +x gradlew
@@ -88,10 +87,10 @@ jobs:
         run: |
           APK_PATH=$(find app/build/outputs/apk/debug/ -name "*.apk" | head -n 1)
           curl -F chat_id=${{ env.CHAT_ID }} -F document=@"$APK_PATH" \
-          https://api.telegram.org/bot${{ env.TG_TOKEN }}/sendDocument -F caption="✅ MISSION ACCOMPLISHED! Your Supreme APK is ready. Total project reconstructed by Nano-AI."
+          https://api.telegram.org/bot${{ env.TG_TOKEN }}/sendDocument -F caption="✅ MISSION ACCOMPLISHED! Your Supreme APK is ready."
 
-      - name: 6. Failure: Deep Diagnostics
+      - name: 6. Failure Notification
         if: failure()
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ env.TG_TOKEN }}/sendMessage \
-          -d chat_id=${{ env.CHAT_ID }} -d text="⚠️ Build blocked. Nano-AI is generating deep logs for self-repair. Stand by..."
+          -d chat_id=${{ env.CHAT_ID }} -d text="⚠️ Build blocked. Nano-AI is generating diagnostics. Stand by..."
