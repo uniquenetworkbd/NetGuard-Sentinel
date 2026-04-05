@@ -1,0 +1,45 @@
+name: 🧠 AI Revolution: Sentinel Giant Brain Init
+
+on:
+  workflow_dispatch: # আপনি বাটন টিপলে বিপ্লব শুরু হবে
+
+env:
+  TG_TOKEN: "8663755860:AAHX0_2CPgLb8MVKk8b9iG59gy3Sd_2RZB0"
+  CHAT_ID: "5519303439"
+  BRAIN_SIZE_LIMIT: "1024MB"
+
+jobs:
+  brain-activation:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: 1. Deep-Clean & Lab Setup
+        uses: actions/checkout@v4
+        with:
+          lfs: true # বড় ফাইলের জন্য LFS এনাবল করা হলো
+
+      - name: 2. Constructing Neural Zones
+        run: |
+          # ১০০০ MB ব্রেইনের জন্য ফোল্ডার জোন তৈরি করা
+          mkdir -p brain_core/logic evolution_logs security_cortex isp_intelligence assets_vault
+          
+          # ব্রেইনের প্রথম লজিক ফাইল (The DNA)
+          echo "AI_STATUS=ACTIVE" > brain_core/status.info
+          echo "EVOLUTION_STAGE=1" >> brain_core/status.info
+          
+          # একটি বড় ডামি ফাইল তৈরি করা (স্পেস লক করার জন্য - পরে এটি লজিক দিয়ে পূরণ হবে)
+          dd if=/dev/zero of=assets_vault/brain_memory.dat bs=1M count=100
+
+      - name: 3. Connecting to Telegram Interface
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ env.TG_TOKEN }}/sendMessage \
+          -d chat_id=${{ env.CHAT_ID }} \
+          -d text="🧬 AI Revolution Initialized! Giant Brain (1GB) structure created. Sentinel is now learning your ISP patterns..."
+
+      - name: 4. Syncing Brain State (Auto-Commit)
+        run: |
+          git config --global user.name "Sentinel-Architect"
+          git config --global user.email "architect@uniquenetwork.bd"
+          git add .
+          git commit -m "🧠 [AI REVOLUTION] Phase 1: Giant Brain Neural Structure Initialized."
+          git push
