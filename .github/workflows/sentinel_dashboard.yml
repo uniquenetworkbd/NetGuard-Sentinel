@@ -1,5 +1,5 @@
 # Sentinel Admin Dashboard: Auto-Deployment
-name:  Sentinel: Admin Dashboard Deployer
+name: 🖥️ Sentinel: Admin Dashboard Deployer
 
 on:
   workflow_dispatch: # ম্যানুয়ালি রান করার জন্য
