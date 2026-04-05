@@ -2,84 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentinel Admin | Command Center</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #0d1117; color: #c9d1d9; }
-        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; }
-        #terminal { background: #010409; height: 300px; overflow-y: auto; font-family: monospace; padding: 15px; border: 1px solid #30363d; color: #7ee787; }
-        .btn-ai { background-color: #238636; color: white; border: none; font-weight: bold; }
-        .btn-ai:hover { background-color: #2ea043; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="nav-header d-flex justify-content-between align-items-center p-3">
+        <h4>🧠 SENTINEL AI COMMAND CENTER</h4>
+        <div id="sys-status"><span class="status-dot"></span> SYSTEM: ACTIVE</div>
+    </div>
+
     <div class="container mt-5">
-        <h2 class="mb-4">🧠 SENTINEL AI COMMAND CENTER</h2>
         <div class="row">
             <div class="col-md-8">
                 <div class="card p-4 mb-4">
                     <h5>🚀 AI Prompt Injector</h5>
                     <div class="input-group mb-3">
-                        <input type="text" id="ai-prompt" class="form-control bg-dark text-white border-secondary" placeholder="উদা: একটি প্রফেশনাল পোর্টফোলিও ওয়েবসাইট তৈরি করো...">
+                        <input type="text" id="ai-prompt" class="form-control" placeholder="Execute new module...">
                         <button class="btn btn-ai" onclick="triggerAI()">Execute Agent</button>
                     </div>
-                    <small class="text-muted">এটি সরাসরি আপনার গিটহাব অ্যাকশনকে কল করবে।</small>
                 </div>
                 <div class="card p-4">
                     <h5>🖥️ Live Activity Log</h5>
-                    <div id="terminal">
-                        [SYSTEM] Dashboard Linked to Sentinel Core...<br>
-                        [READY] Awaiting Manual Instruction...
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card p-4">
-                    <h5>📊 Core Stats</h5>
-                    <p>AI Engine: <b>ONLINE</b></p>
-                    <p>Storage: <b>1024MB</b></p>
-                    <p>Last Sync: <span id="sync-time">Just Now</span></p>
-                    <hr>
-                    <h6>Active Modules:</h6>
-                    <ul>
-                        <li>NetGuard Sentinel</li>
-                        <li>Nano AI</li>
-                        <li>ISP Recon</li>
-                    </ul>
+                    <div id="terminal">[READY] Neural Link Established...</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        async function triggerAI() {
-    const prompt = document.getElementById('ai-prompt').value;
-    const log = document.getElementById('terminal');
-    
-    // আপনার রিপোজিটরির তথ্য
-    const OWNER = 'uniquenetworkbd';
-    const REPO = 'NetGuard-Sentinel';
-    const WORKFLOW_ID = 'sentinel_architect.yml'; 
-    const TOKEN = 'YOUR_GITHUB_TOKEN_HERE'; // এটি সিক্রেট হিসেবে ব্যবহার করা ভালো
-
-    log.innerHTML += `<br><span style="color: #d29922;">[CONNECTING]</span> Dialing Neural Bridge...`;
-
-    const response = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${TOKEN}`,
-            'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify({ ref: 'main', inputs: { prompt: prompt } })
-    });
-
-    if (response.status === 204) {
-        log.innerHTML += `<br><span style="color: #7ee787;">[SUCCESS]</span> Agent is now writing code for: ${prompt}`;
-    } else {
-        log.innerHTML += `<br><span style="color: #f85149;">[FAILED]</span> Bridge connection lost. Check Token.`;
-    }
-}
-
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
