@@ -1,54 +1,19 @@
-name: NetGuard Nano-AI Control Center
-
-on:
-  workflow_dispatch:
-  push:
-    branches: [ main ]
-
-jobs:
-  ai-agent-control:
-    runs-on: ubuntu-latest
-    permissions: write-all
-    steps:
-      - name: 1. Setup Lab & Checkout
-        uses: actions/checkout@v4
-
-      - name: 2. Connect to Telegram & DeepSeek
-        env:
-          TG_TOKEN: "8663755860:AAHX0_2CPgLb8MVKk8b9iG59gy3Sd_2RZB0"
-          DS_KEY: "sk-94945e8a5d9740ebac3b702b000f51df"
-          CHAT_ID: "5519303439" # আপনার ইউজার আইডি
+- name: 3. Pro-Level Auto-Coding (The Final Touch)
         run: |
-          echo "🤖 Nano AI waking up..."
-          # টেলিগ্রামে মেসেজ পাঠানো
-          curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-            -d chat_id=$CHAT_ID -d text="🚀 NetGuard AI-Sentinel is Online. Analyzing project errors..."
-
-          # DeepSeek এর মাধ্যমে এরর অ্যানালাইসিস (উদাহরণ)
-          RESPONSE=$(curl -s https://api.deepseek.com/chat/completions \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $DS_KEY" \
-            -d '{"model": "deepseek-chat", "messages": [{"role": "user", "content": "Analyze Android build errors and fix compileDebugKotlin."}]}')
+          # এআই এখন আপনার অ্যাপের মূল ফাইলগুলো তৈরি করছে
+          mkdir -p app/src/main/java/com/guardnet/vpn
           
-          echo "AI has provided a solution."
-
-      - name: 3. Auto-Repair & Force Build
-        run: |
-          # রুট স্ট্রাকচার মেরামত
-          echo "rootProject.name = 'NetGuard-Sentinel'" > settings.gradle
-          echo "include ':app'" >> settings.gradle
-          ./gradlew clean assembleDebug --stacktrace || echo "Build failed, sending log to Telegram."
-
-      - name: 4. Send Result/APK to Telegram
-        if: always()
-        env:
-          TG_TOKEN: "8663755860:AAHX0_2CPgLb8)MVKk8b9iG59gy3Sd_2RZB0"
-          CHAT_ID: "5519303439"
-        run: |
-          if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
-            curl -F chat_id=$CHAT_ID -F document=@"app/build/outputs/apk/debug/app-debug.apk" \
-            https://api.telegram.org/bot$TG_TOKEN/sendDocument -F caption="✅ Build Success! Here is your NetGuard APK."
-          else
-            curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-            -d chat_id=$CHAT_ID -d text="❌ Build failed again. I am analyzing the logs to auto-fix."
-          fi
+          cat <<EOF > app/src/main/java/com/guardnet/vpn/MainActivity.kt
+          package com.guardnet.vpn
+          import android.os.Bundle
+          import androidx.appcompat.app.AppCompatActivity
+          class MainActivity : AppCompatActivity() {
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+                  // AI Generated UI and Logic
+              }
+          }
+          EOF
+          
+          # এবার বিল্ড শুরু করা
+          ./gradlew :app:assembleDebug --stacktrace
