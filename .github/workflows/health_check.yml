@@ -1,7 +1,7 @@
 name: 🚀 System Health Check
 
 on:
-  workflow_dispatch: # আপনি ম্যানুয়ালি রান করবেন
+  workflow_dispatch: 
 
 jobs:
   check-secrets:
@@ -18,12 +18,12 @@ jobs:
         run: |
           echo "🔍 Testing Telegram Connection..."
           TG_RES=$(curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-            -d chat_id=$CHAT_ID -d text="✅ Giant Brain Health Check: Telegram connection is ACTIVE.")
+            -d chat_id=$CHAT_ID -d text="✅ Giant Brain Health Check: Telegram connection is ACTIVE using TELEGRAMBOTTOKEN and TELEGRAMCHATID.")
           
           if [[ $TG_RES == *"\"ok\":true"* ]]; then
             echo "Telegram: OK"
           else
-            echo "Telegram: FAILED"
+            echo "Telegram: FAILED. Check your Secret names in GitHub."
             exit 1
           fi
 
@@ -36,13 +36,13 @@ jobs:
           if [[ $AI_RES == *"choices"* ]]; then
             echo "DeepSeek AI: OK"
             curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-              -d chat_id=$CHAT_ID -d text="✅ Giant Brain Health Check: DeepSeek AI Engine is ACTIVE."
+              -d chat_id=$CHAT_ID -d text="✅ Giant Brain Health Check: DeepSeek AI Engine is ACTIVE using NETGUARDSENTINELDS."
           else
-            echo "DeepSeek AI: FAILED"
+            echo "DeepSeek AI: FAILED. Check your NETGUARDSENTINELDS secret."
             curl -s -X POST https://api.telegram.org/bot$TG_TOKEN/sendMessage \
-              -d chat_id=$CHAT_ID -d text="❌ DeepSeek AI Connection Failed. Please check your DS_KEY."
+              -d chat_id=$CHAT_ID -d text="❌ DeepSeek AI Connection Failed."
             exit 1
           fi
 
       - name: 3. Final Report
-        run: echo "🎉 All systems are operational! Your Giant Brain is ready for the revolution."
+        run: echo "🎉 Connection confirmed with your specified secret names."
