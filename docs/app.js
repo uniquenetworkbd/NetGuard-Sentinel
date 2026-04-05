@@ -12,7 +12,7 @@ async function triggerAI() {
         const response = await fetch('https://api.github.com/repos/uniquenetworkbd/NetGuard-Sentinel/actions/workflows/sentinel_architect.yml/dispatches', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer YOUR_PERSONAL_ACCESS_TOKEN',
+                'Authorization': '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',
                 'Accept': 'application/vnd.github.v3+json'
             },
             body: JSON.stringify({ ref: 'main', inputs: { prompt: prompt } })
