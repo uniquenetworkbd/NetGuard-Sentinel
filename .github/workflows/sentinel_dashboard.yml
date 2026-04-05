@@ -1,0 +1,90 @@
+# Sentinel Admin Dashboard: Auto-Deployment
+name: 🖥️ Sentinel: Admin Dashboard Deployer
+
+on:
+  workflow_dispatch: # ম্যানুয়ালি রান করার জন্য
+  push:
+    branches: [ main ]
+
+jobs:
+  build-dashboard:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: 📂 Neural Connection
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Generate Dashboard Framework
+        run: |
+          mkdir -p docs
+          cat <<EOF > docs/index.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Sentinel Admin | AI-Ops Dashboard</title>
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <style>
+                  body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+                  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; margin-bottom: 20px; }
+                  .stat-val { font-size: 2rem; font-weight: bold; color: #58a6ff; }
+                  .status-online { color: #238636; }
+                  .nav-header { border-bottom: 1px solid #30363d; padding: 15px; background: #010409; }
+              </style>
+          </head>
+          <body>
+              <div class="nav-header d-flex justify-content-between align-items-center">
+                  <h4>🧠 SENTINEL ADMIN PANEL</h4>
+                  <span class="status-online">● System Operational</span>
+              </div>
+              <div class="container mt-4">
+                  <div class="row">
+                      <div class="col-md-4">
+                          <div class="card p-3">
+                              <h6>Storage Usage</h6>
+                              <div class="stat-val">1024 MB</div>
+                              <p class="text-muted">Total Available Space</p>
+                          </div>
+                      </div>
+                      <div class="col-md-4">
+                          <div class="card p-3">
+                              <h6>AI Engine Status</h6>
+                              <div class="stat-val" style="color: #bc8cff;">ONLINE</div>
+                              <p class="text-muted">NSDS & Vibecode Synced</p>
+                          </div>
+                      </div>
+                      <div class="col-md-4">
+                          <div class="card p-3">
+                              <h6>Total Modules</h6>
+                              <div class="stat-val">30</div>
+                              <p class="text-muted">Roadmap Targets</p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-md-12">
+                          <div class="card p-4">
+                              <h5>🤖 AI Command Terminal</h5>
+                              <hr>
+                              <div id="activity-feed" style="height: 200px; overflow-y: auto; background: #010409; padding: 10px; border-radius: 5px; font-family: monospace;">
+                                  [SYSTEM] Dashboard initialized successfully...<br>
+                                  [SENTINEL] Ready for neural command injection...
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </body>
+          </html>
+          EOF
+
+      - name: 🛰️ Sync Dashboard to Repo
+        run: |
+          git config --global user.name "Sentinel-Architect"
+          git config --global user.email "architect@uniquenetwork.bd"
+          git add docs/
+          git commit -m "🖥️ [DASHBOARD] Deploying Admin Panel v1.0" || echo "No changes to commit"
+          git push origin main
