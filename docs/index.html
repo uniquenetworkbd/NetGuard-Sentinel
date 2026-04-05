@@ -52,15 +52,34 @@
     </div>
 
     <script>
-        function triggerAI() {
-            const prompt = document.getElementById('ai-prompt').value;
-            const log = document.getElementById('terminal');
-            if(!prompt) return alert("প্রম্পট লিখুন!");
-            
-            log.innerHTML += `<br><span style="color: #d29922;">[SENDING]</span> Requesting AI to: ${prompt}`;
-            // এখানে আমরা পরে GitHub API Bridge যুক্ত করব
-            document.getElementById('ai-prompt').value = '';
-        }
+        async function triggerAI() {
+    const prompt = document.getElementById('ai-prompt').value;
+    const log = document.getElementById('terminal');
+    
+    // আপনার রিপোজিটরির তথ্য
+    const OWNER = 'uniquenetworkbd';
+    const REPO = 'NetGuard-Sentinel';
+    const WORKFLOW_ID = 'sentinel_architect.yml'; 
+    const TOKEN = 'YOUR_GITHUB_TOKEN_HERE'; // এটি সিক্রেট হিসেবে ব্যবহার করা ভালো
+
+    log.innerHTML += `<br><span style="color: #d29922;">[CONNECTING]</span> Dialing Neural Bridge...`;
+
+    const response = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${TOKEN}`,
+            'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify({ ref: 'main', inputs: { prompt: prompt } })
+    });
+
+    if (response.status === 204) {
+        log.innerHTML += `<br><span style="color: #7ee787;">[SUCCESS]</span> Agent is now writing code for: ${prompt}`;
+    } else {
+        log.innerHTML += `<br><span style="color: #f85149;">[FAILED]</span> Bridge connection lost. Check Token.`;
+    }
+}
+
     </script>
 </body>
 </html>
