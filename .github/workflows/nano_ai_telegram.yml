@@ -1,19 +1,68 @@
-- name: 3. Pro-Level Auto-Coding (The Final Touch)
+name: NetGuard Final APK Generation
+
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  TG_TOKEN: "8663755860:AAHX0_2CPgLb8MVKk8b9iG59gy3Sd_2RZB0"
+  CHAT_ID: "5519303439"
+  DS_KEY: "sk-94945e8a5d9740ebac3b702b000f51df"
+
+jobs:
+  build-and-deliver:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: 1. Cleaning & Checkout
+        uses: actions/checkout@v4
+
+      - name: 2. Signal Telegram (Start)
         run: |
-          # এআই এখন আপনার অ্যাপের মূল ফাইলগুলো তৈরি করছে
+          curl -s -X POST https://api.telegram.org/bot${{ env.TG_TOKEN }}/sendMessage \
+          -d chat_id=${{ env.CHAT_ID }} -d text="🔨 Building your First Success APK... Please wait 5-8 minutes."
+
+      - name: 3. Nano AI Structural Repair
+        run: |
+          # সব পুরানো ফাইল মুছে ফ্রেশ স্ট্রাকচার তৈরি
+          rm -rf app/build.gradle
           mkdir -p app/src/main/java/com/guardnet/vpn
           
-          cat <<EOF > app/src/main/java/com/guardnet/vpn/MainActivity.kt
-          package com.guardnet.vpn
-          import android.os.Bundle
-          import androidx.appcompat.app.AppCompatActivity
-          class MainActivity : AppCompatActivity() {
-              override fun onCreate(savedInstanceState: Bundle?) {
-                  super.onCreate(savedInstanceState)
-                  // AI Generated UI and Logic
-              }
+          # Root Settings
+          echo "rootProject.name = 'NetGuard-Sentinel'" > settings.gradle
+          echo "include ':app'" >> settings.gradle
+
+          # App Build Logic (AI Optimized)
+          cat <<EOF > app/build.gradle
+          plugins { id 'com.android.application'; id 'kotlin-android' }
+          android {
+              namespace 'com.guardnet.vpn'
+              compileSdk 34
+              defaultConfig { applicationId "com.guardnet.vpn"; minSdk 24; targetSdk 34; versionCode 1; versionName "1.0" }
+              buildTypes { release { minifyEnabled false } }
+              compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+          }
+          dependencies {
+              implementation 'androidx.core:core-ktx:1.12.0'
+              implementation 'androidx.appcompat:appcompat:1.6.1'
           }
           EOF
-          
-          # এবার বিল্ড শুরু করা
+
+      - name: 4. Execution (Gradle Build)
+        run: |
+          gradle wrapper --gradle-version 8.2
+          chmod +x gradlew
           ./gradlew :app:assembleDebug --stacktrace
+
+      - name: 5. Send APK to Telegram (Success)
+        if: success()
+        run: |
+          APK_PATH=$(find app/build/outputs/apk/debug/ -name "*.apk")
+          curl -F chat_id=${{ env.CHAT_ID }} -F document=@"$APK_PATH" \
+          https://api.telegram.org/bot${{ env.TG_TOKEN }}/sendDocument -F caption="✅ CONGRATULATIONS! Your first success NetGuard APK is ready."
+
+      - name: 6. Send Error Log (Failure)
+        if: failure()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ env.TG_TOKEN }}/sendMessage \
+          -d chat_id=${{ env.CHAT_ID }} -d text="❌ Build failed. Nano AI is recording the logs for auto-fix."
