@@ -12,7 +12,7 @@ jobs:
 
       - name: 2. Test Connections (AI & Telegram)
         env:
-          DS_KEY: ${{ secrets.NETGUARDSENTINELDS }}
+          DS_KEY: ${{ secrets.NetGuardSentinelDS }}
           TG_TOKEN: ${{ secrets.TELEGRAMBOTTOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAMCHATID }}
         run: |
